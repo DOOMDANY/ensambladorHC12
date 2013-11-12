@@ -94,6 +94,14 @@ public class CodigoMaquina{
                                 else{
                                     if(listaInst.get(i).mod_dirs.equals("IDX2"))
                                         listaInst.get(i).cod_maq = CMIDX2(listaInst.get(i));
+                                    else{
+                                        if(listaInst.get(i).mod_dirs.equals("[IDX2]"))
+                                            listaInst.get(i).cod_maq = CMIDXI(listaInst.get(i));
+                                        else{
+                                            if(listaInst.get(i).mod_dirs.equals("[D,IDX]"))
+                                                listaInst.get(i).cod_maq = CMIDXD(listaInst.get(i));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -103,6 +111,58 @@ public class CodigoMaquina{
             i++;
         }
         return listaInst;
+    }
+    
+    private String CMIDXI(Linea ln){
+        String[] reg = new String[]{"X", "Y", "SP", "PC"};
+        String[] rr = new String[]{"00", "01", "10", "11"};
+        int i = 0;
+        while(!ln.codop_inf.mod_dir.get(i).equals(ln.mod_dirs)) i++;
+        StringTokenizer tokens = new StringTokenizer(ln.codop_inf.cod_hex.get(i), " ");
+        String aux1 = "", aux2, aux3, xb;
+        while(tokens.hasMoreTokens())
+            aux1 += tokens.nextToken();
+        tokens = new StringTokenizer(ln.oper.substring(1, ln.oper.length() - 1), ",");
+        aux2 = tokens.nextToken();
+        try{
+            BasesNumericas numero = new BasesNumericas(aux2);
+            aux3 = numero.HexnD(4);
+            aux2 = tokens.nextToken();
+            i = 0;
+            while(i < reg.length && !aux2.toUpperCase().equals(reg[i])) i++;
+            xb = "111" + rr[i] + "011";
+            numero = new BasesNumericas("%" + xb);
+            aux1 += numero.HexnD(2) + aux3;
+        }
+        catch(NumberFormatException nfe){
+            
+        }
+        return aux1;
+    }
+    
+    private String CMIDXD(Linea ln){
+        String[] reg = new String[]{"X", "Y", "SP", "PC"};
+        String[] rr = new String[]{"00", "01", "10", "11"};
+        int i = 0;
+        while(!ln.codop_inf.mod_dir.get(i).equals(ln.mod_dirs)) i++;
+        StringTokenizer tokens = new StringTokenizer(ln.codop_inf.cod_hex.get(i), " ");
+        String aux1 = "", aux2, xb;
+        while(tokens.hasMoreTokens())
+            aux1 += tokens.nextToken();
+        tokens = new StringTokenizer(ln.oper.substring(1, ln.oper.length() - 1), ",");
+        tokens.nextToken();
+        aux2 = tokens.nextToken();
+        try{
+            i = 0;
+            while(i < reg.length && !aux2.toUpperCase().equals(reg[i])) i++;
+            xb = "111" + rr[i] + "111";
+            BasesNumericas numero = new BasesNumericas("%" + xb);
+            aux1 += numero.HexnD(2);
+        }
+        catch(NumberFormatException nfe){
+            
+        }
+        return aux1;
     }
     
     private String CMIDXppdi(Linea ln){
