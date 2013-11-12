@@ -52,4 +52,8 @@ public class ListaTabsim extends ArrayList<Tabsim>{
         }
         return null;
     }
+    
+    public boolean Eliminar(String etq){
+    	return this.remove(Buscar(etq));
+    }
 }

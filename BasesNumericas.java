@@ -14,7 +14,6 @@ public class BasesNumericas{
     
     protected BasesNumericas(String valorNum){
         valor = ValNeg(valorNum);
-        //System.out.println(valor);
         base = 10;
     }
     
@@ -69,7 +68,7 @@ public class BasesNumericas{
                     cad_aux = "";
                 }
              if(valorNum.charAt(1) == '1'){
-                 for(int i = 1; i < valorNum.length(); i++){
+                for(int i = 1; i < valorNum.length(); i++){
                     if(valorNum.charAt(i) != '1'){
                         cad_aux = "1";
                         for(; i < valorNum.length(); i++)
@@ -90,7 +89,13 @@ public class BasesNumericas{
     }
     
     private int Cados(int bits){
-        return (~bits) + 1;
+        int aux = 0;
+        while(Integer.highestOneBit(bits) >= 0){
+            bits <<= 1;
+            aux++;
+        }
+        bits >>= aux;
+        return bits;
     }
     
     protected void CambioBase(int baseNum){
@@ -104,15 +109,17 @@ public class BasesNumericas{
         return Integer.parseInt(valor);
     }
     
-    public String Hex4D(){
-        int i;
-        i = valor.length();
-        String aux = "";
-        while(i < 4){
-            aux += "0";
+    public String HexnD(int D){
+        String aux1 = "", aux2;
+        aux2 = Integer.toHexString(Integer.parseInt(valor)).toUpperCase();
+        if(aux2.charAt(0) == 'F' && aux2.length() >= D)
+            aux2 = aux2.substring(aux2.length() - D);
+        int i = aux2.length();
+        while(i < D){
+            aux1 += "0";
             i++;
         }
-        aux += valor;
-        return aux.toUpperCase();
+        aux1 += aux2;
+        return aux1.toUpperCase();
     }
 }

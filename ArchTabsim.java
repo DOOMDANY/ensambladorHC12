@@ -18,13 +18,17 @@ public class ArchTabsim {
     String buffer;
     
     public ArchTabsim(File archivoAux){
+        archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".TDS");
+    }
+    
+    public boolean Crear(){
         try{
-            archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".TDS");
             archivo.createNewFile();
         }
         catch(IOException ioe){
-            
+            return false;
         }
+        return true;
     }
     
     public boolean Abrir(){
@@ -54,9 +58,9 @@ public class ArchTabsim {
     }
     
     public boolean Escribirln(Tabsim simb){
-        BasesNumericas numero = new BasesNumericas(simb.direccion, 16);
+        BasesNumericas numero = new BasesNumericas(Integer.toString(simb.direccion));
         try{
-            buffer = simb.etq + "\t\t" + numero.Hex4D();
+            buffer = simb.etq + "\t\t" + numero.HexnD(4);
             bw.write(buffer);
             bw.newLine();
         }

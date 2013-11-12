@@ -17,13 +17,17 @@ public class ArchError {
     String buffer;
     
     public ArchError(File archivoAux){
+        archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".ERR");
+    }
+    
+    public boolean Crear(){
         try{
-            archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".ERR");
             archivo.createNewFile();
         }
         catch(IOException ioe){
-            
+            return false;
         }
+        return true;
     }
     
     public boolean Abrir(){
@@ -55,6 +59,17 @@ public class ArchError {
     public boolean Escribirln(Linea ln){
         try{
             buffer = ln.nlinea + "\t" + ln.error;
+            bw.write(buffer);
+            bw.newLine();
+        }
+        catch(IOException ioe){
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean Escribir(String buffer){
+        try{
             bw.write(buffer);
             bw.newLine();
         }

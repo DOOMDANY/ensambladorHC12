@@ -14,7 +14,7 @@ import java.util.regex.*;
 public class Linea{
     int nlinea, pc;
     Contloc conloc;
-    String etq, codop, oper, error, mod_dirs;
+    String etq, codop, oper, error, mod_dirs, cod_maq;
     boolean org, end, coment;
     Tabop codop_inf;
     ListaTabsim lista_tabsim;
@@ -33,6 +33,7 @@ public class Linea{
         nlinea = numero_linea;
         pc = _pc;
         conloc = new Contloc(pc);
+        cod_maq = "";
     }
     
     private boolean Tokenizar(String linea){
