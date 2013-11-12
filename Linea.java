@@ -13,8 +13,9 @@ import java.util.regex.*;
 
 public class Linea{
     int nlinea;
-    String etq, codop, oper, error;
+    String etq, codop, oper, error, mod_dirs;
     boolean end, coment;
+    Tabop codop_inf;
     //String comentario;
     
     public Linea(int numero_linea){
@@ -24,6 +25,7 @@ public class Linea{
         error = null;
         end = false;
         coment = false;
+        mod_dirs = "";
         //comentario = null;
         nlinea = numero_linea;
     }
@@ -84,11 +86,12 @@ public class Linea{
         return correcto;
     }
     
-    public boolean Validar(String linea){
+    public boolean Validar(String linea, ListaTabop lista_tabop){
         boolean correcto = true;
         Pattern expReg;
         Matcher comprobador;
-        if(Tokenizar(linea)){
+        Tokenizar(linea);
+        if(correcto && !coment){
             if(etq != null){
                 expReg = Pattern.compile("[a-zA-Z][\\w]{0,7}");
                 comprobador = expReg.matcher(etq);
@@ -115,9 +118,44 @@ public class Linea{
                     correcto = false;
                 }
             }
+            if(correcto && !end)
+                correcto = ValidarCodop(lista_tabop);
         }
         else
             correcto = false;
+        return correcto;
+    }
+    
+    public boolean ValidarCodop(ListaTabop lista_tabop){
+        boolean correcto = true, bandoper = false;
+        int i = 1;
+        codop_inf = lista_tabop.Buscar(codop.toUpperCase());
+        if(codop_inf != null){
+            mod_dirs = codop_inf.mod_dir.get(0);
+            while(i < codop_inf.nmodos){
+                mod_dirs = mod_dirs + ", " + codop_inf.mod_dir.get(i);
+                i++;
+            }
+            i = 0;
+            while(i < codop_inf.nmodos && !bandoper){
+                if(codop_inf.b_calcular.get(i) > 0)
+                    bandoper = true;
+                i++;
+            }
+            if(!bandoper && !oper.equals("NULL")){
+                System.out.println(bandoper+" "+oper);
+                correcto = false;
+                error = "no se necesita OPER (operando)";
+            }
+            if(bandoper && oper.equals("NULL")){
+                correcto = false;
+                error = "se requiere OPER (operando)";
+            }
+        }
+        else{
+            correcto = false;
+            error = "no existe el CODOP (codigo de operacion)";
+        }
         return correcto;
     }
 }

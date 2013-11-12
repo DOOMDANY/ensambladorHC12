@@ -31,9 +31,9 @@ public class ArchInst {
         try{
             fw = new FileWriter(archivo);
             bw = new BufferedWriter(fw);
-            bw.write("LINEA\tETQ\t\tCODOP\tOPER");
+            bw.write("LINEA\tETQ\tCODOP\tOPER\tMODOS");
             bw.newLine();
-            bw.write(".....................................................................");
+            bw.write("...................................................................................................");
             bw.newLine();
         }
         catch(IOException ioe){
@@ -55,7 +55,7 @@ public class ArchInst {
     
     public boolean Escribirln(Linea ln){
         try{
-            buffer = ln.nlinea + "\t" + ln.etq + "\t\t" + ln.codop + "\t" + ln.oper;
+            buffer = ln.nlinea + "\t" + ln.etq + "\t" + ln.codop + "\t" + ln.oper + "\t" + ln.mod_dirs;
             bw.write(buffer);
             bw.newLine();
         }
