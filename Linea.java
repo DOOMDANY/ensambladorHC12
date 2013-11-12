@@ -90,7 +90,7 @@ public class Linea{
         boolean correcto = true;
         Pattern expReg;
         Matcher comprobador;
-        Tokenizar(linea);
+        correcto = Tokenizar(linea);
         if(correcto && !coment){
             if(etq != null){
                 expReg = Pattern.compile("[a-zA-Z][\\w]{0,7}");
@@ -111,6 +111,10 @@ public class Linea{
                 }
             }
             if(oper != null && correcto){
+            	if(end && !oper.equals("NULL")){
+            		error = "la directiva \"END\" no debe tener OPER (operando)";
+            		correcto = false;
+            	}
                 expReg = Pattern.compile(".+");
                 comprobador = expReg.matcher(oper);
                 if(!comprobador.matches()){
@@ -129,14 +133,20 @@ public class Linea{
     public boolean ValidarCodop(ListaTabop lista_tabop){
         boolean correcto = true, bandoper = false;
         int i = 1;
+        ModDir direccionamiento = new ModDir();
         codop_inf = lista_tabop.Buscar(codop.toUpperCase());
         if(codop_inf != null){
-            mod_dirs = codop_inf.mod_dir.get(0);
+            mod_dirs = direccionamiento.Master(codop_inf, oper.toUpperCase());
+            if(direccionamiento.error != null){
+                error = direccionamiento.error;
+                correcto = false;
+            }
+            /*mod_dirs = codop_inf.mod_dir.get(0);
             while(i < codop_inf.nmodos){
                 mod_dirs = mod_dirs + ", " + codop_inf.mod_dir.get(i);
                 i++;
-            }
-            i = 0;
+            }*/
+            /*i = 0;
             while(i < codop_inf.nmodos && !bandoper){
                 if(codop_inf.b_calcular.get(i) > 0)
                     bandoper = true;
@@ -150,7 +160,7 @@ public class Linea{
             if(bandoper && oper.equals("NULL")){
                 correcto = false;
                 error = "se requiere OPER (operando)";
-            }
+            }*/
         }
         else{
             correcto = false;

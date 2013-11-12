@@ -16,6 +16,10 @@ public class EnsambladorHC12 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        /*ModDir M = new ModDir();
+        System.out.println(M.FormatoOper("8,+PC"));*/
+        /*BasesNumericas num = new BasesNumericas("%7FFF", 16);
+        System.out.println(num.ValorEntero());*/
         ArchAsm asm = new ArchAsm();
         ArchInst inst;
         ArchError err;
@@ -33,6 +37,7 @@ public class EnsambladorHC12 {
             }
             ln = new Linea(i);
             while((linea = asm.Leerln()) != null && ln.end == false){
+                //System.out.println("LINEA "+ i);
                 ln.Validar(linea, lista_tabop);
                 cola.add(ln);
                 if(!ln.end){
