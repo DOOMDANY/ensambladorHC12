@@ -40,7 +40,7 @@ public class ModDir {
             formato = 11;
         switch(formato){
             case 0:
-                error = "formato de OPER (operando) desconocido";
+                error = "formato de OPER (operando) no valido para ningun CODOP";
             break;
             case 1:
                 /*if((mod_dir = ModINH(codop_inf)).equals(""))

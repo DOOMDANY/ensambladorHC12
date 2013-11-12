@@ -8,18 +8,18 @@ package ensambladorhc12;
  *
  * @author DOOMDANY
  */
+
 import java.io.*;
 
-public class ArchInst {
-    
+public class ArchTabsim {
     public File archivo;
     FileWriter fw;
     BufferedWriter bw;
     String buffer;
     
-    public ArchInst(File archivoAux){
+    public ArchTabsim(File archivoAux){
         try{
-            archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".INST");
+            archivo = new File(archivoAux.getPath().substring(0, archivoAux.getPath().length()-4)+".TDS");
             archivo.createNewFile();
         }
         catch(IOException ioe){
@@ -31,7 +31,7 @@ public class ArchInst {
         try{
             fw = new FileWriter(archivo);
             bw = new BufferedWriter(fw);
-            bw.write("LINEA\t\tCONTLOC\t\tETQ\t\tCODOP\t\tOPER\t\tMODOS");
+            bw.write("ETQ\t\tVALOR");
             bw.newLine();
             bw.write("...................................................................................................");
             bw.newLine();
@@ -53,10 +53,10 @@ public class ArchInst {
         }
     }
     
-    public boolean Escribirln(Linea ln){
-        BasesNumericas numero = new BasesNumericas(ln.conloc.CONLOC, 16);
+    public boolean Escribirln(Tabsim simb){
+        BasesNumericas numero = new BasesNumericas(simb.direccion, 16);
         try{
-            buffer = ln.nlinea + "\t\t" + numero.Hex4D() + "\t\t" + ln.etq + "\t\t" + ln.codop + "\t\t" + ln.oper + "\t\t" + ln.mod_dirs;
+            buffer = simb.etq + "\t\t" + numero.Hex4D();
             bw.write(buffer);
             bw.newLine();
         }

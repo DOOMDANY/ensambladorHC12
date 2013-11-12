@@ -103,4 +103,16 @@ public class BasesNumericas{
     protected int ValorEntero(){
         return Integer.parseInt(valor);
     }
+    
+    public String Hex4D(){
+        int i;
+        i = valor.length();
+        String aux = "";
+        while(i < 4){
+            aux += "0";
+            i++;
+        }
+        aux += valor;
+        return aux.toUpperCase();
+    }
 }

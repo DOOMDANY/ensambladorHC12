@@ -12,32 +12,50 @@ import java.util.*;
 import java.util.regex.*;
 
 public class Linea{
-    int nlinea;
+    int nlinea, pc;
+    Contloc conloc;
     String etq, codop, oper, error, mod_dirs;
-    boolean end, coment;
+    boolean org, end, coment;
     Tabop codop_inf;
+    ListaTabsim lista_tabsim;
     //String comentario;
     
-    public Linea(int numero_linea){
+    public Linea(int numero_linea, int _pc){
         etq= "NULL";
         codop = "NULL";
         oper = "NULL";
         error = null;
+        org = false;
         end = false;
         coment = false;
         mod_dirs = "";
         //comentario = null;
         nlinea = numero_linea;
+        pc = _pc;
+        conloc = new Contloc(pc);
     }
     
     private boolean Tokenizar(String linea){
         boolean correcto = true;
-        StringTokenizer tokens = new StringTokenizer(linea, ";", true);
+        String aux = linea;
+        Pattern expReg;
+        Matcher comprobador;
+        expReg = Pattern.compile(".+\".*\\\\;.*\".*");
+        comprobador = expReg.matcher(aux);
+        while(comprobador.matches()){
+            expReg = Pattern.compile("\\\\;");
+            comprobador = expReg.matcher(aux);
+            aux = comprobador.replaceFirst("_aux(punto_y_coma)");
+        }
+        StringTokenizer tokens = new StringTokenizer(aux, ";", true);
         if(tokens.countTokens() > 0){
-            linea = tokens.nextToken();
-            if(linea.charAt(0) != ';'){
-                tokens = new StringTokenizer(linea);
-                if(linea.charAt(0) == ' ' || linea.charAt(0) == '\t'){
+            aux = tokens.nextToken();
+            if(aux.charAt(0) != ';'){
+                expReg = Pattern.compile("_aux\\(punto_y_coma\\)");
+                comprobador = expReg.matcher(aux);
+                aux = comprobador.replaceAll(";");
+                tokens = new StringTokenizer(aux);
+                if(aux.charAt(0) == ' ' || aux.charAt(0) == '\t'){
                     if(tokens.countTokens() < 1)
                         coment = true;
                     else
@@ -49,8 +67,24 @@ public class Linea{
                                 oper = tokens.nextToken();
                             }
                             else{
-                                error = "Demasiados argumentos en la linea, se esperaba 'CODOP' o 'CODOP OPER'";
-                                correcto = false;
+                                codop = tokens.nextToken();
+                                aux = tokens.nextToken();
+                                aux += tokens.nextToken("");
+                                int i = aux.length() - 1;
+                                while((aux.charAt(i) == '\t' || aux.charAt(i) == ' ') && i >= 0) i--;
+                                aux = aux.substring(0, i + 1);
+                                expReg = Pattern.compile("\".+\"");
+                                comprobador = expReg.matcher(aux);
+                                if(comprobador.matches()){
+                                    expReg = Pattern.compile("\\\\\"");
+                                    comprobador = expReg.matcher(aux);
+                                    aux = comprobador.replaceAll("\"");
+                                    oper = aux;
+                                }
+                                else{
+                                    error = "Demasiados argumentos en la linea, se esperaba 'CODOP' o 'CODOP OPER'";
+                                    correcto = false;
+                                }
                             }
                 }
                 else{
@@ -73,8 +107,25 @@ public class Linea{
                                     oper = tokens.nextToken();
                                 }
                                 else{
-                                    error = "Demasiados argumentos en la linea, se esperaban < 4.'ETQ CODOP OPER'";
-                                    correcto = false;
+                                    etq = tokens.nextToken();
+                                    codop = tokens.nextToken();
+                                    aux = tokens.nextToken();
+                                    aux += tokens.nextToken("");
+                                    int i = aux.length() - 1;
+                                    while((aux.charAt(i) == '\t' || aux.charAt(i) == ' ') && i >= 0) i--;
+                                    aux = aux.substring(0, i + 1);
+                                    expReg = Pattern.compile("\".+\"");
+                                    comprobador = expReg.matcher(aux);
+                                    if(comprobador.matches()){
+                                        expReg = Pattern.compile("\\\\\"");
+                                        comprobador = expReg.matcher(aux);
+                                        aux = comprobador.replaceAll("\"");
+                                        oper = aux;
+                                    }
+                                    else{
+                                        error = "Demasiados argumentos en la linea, se esperaban < 4.'ETQ CODOP OPER'";
+                                        correcto = false;
+                                    }
                                 }
                 }
             }
@@ -122,24 +173,45 @@ public class Linea{
                     correcto = false;
                 }
             }
-            if(correcto && !end)
-                correcto = ValidarCodop(lista_tabop);
+            /*if(correcto && !etq.equals("NULL"))
+                correcto = ValidarEtq();*/
+            //if(!end){
+                if(correcto)
+                    correcto = ValidarCodop(lista_tabop);
+            //}
         }
         else
             correcto = false;
         return correcto;
     }
     
+    public boolean ValidarEtq(Contloc conlocaux){
+        boolean correcto = true;
+        Tabsim simb = new Tabsim(etq, conlocaux.CONLOC);
+        if(!lista_tabsim.Agregar(simb)){
+            error = "ETQ (etiqueta) duplicada";
+            correcto = false;
+        }
+        return correcto;
+    }
+    
     public boolean ValidarCodop(ListaTabop lista_tabop){
         boolean correcto = true, bandoper = false;
-        int i = 1;
         ModDir direccionamiento = new ModDir();
+        Contloc conlocaux = new Contloc(pc);
         codop_inf = lista_tabop.Buscar(codop.toUpperCase());
         if(codop_inf != null){
             mod_dirs = direccionamiento.Master(codop_inf, oper.toUpperCase());
             if(direccionamiento.error != null){
                 error = direccionamiento.error;
                 correcto = false;
+            }
+            else{
+                for(int i = 0; i < codop_inf.nmodos; i++){
+                    if(codop_inf.mod_dir.get(i).equals(mod_dirs))
+                        if(correcto)
+                            conlocaux = new Contloc(pc, codop_inf.b_total.get(i));
+                }
             }
             /*mod_dirs = codop_inf.mod_dir.get(0);
             while(i < codop_inf.nmodos){
@@ -163,9 +235,22 @@ public class Linea{
             }*/
         }
         else{
-            correcto = false;
-            error = "no existe el CODOP (codigo de operacion)";
+            Directivas directiva = new Directivas(etq, codop.toUpperCase(), oper.toUpperCase(), pc);
+            directiva.org = org;
+            conlocaux = directiva.Validar();
+            if(directiva.error != null){
+                error = directiva.error;
+                correcto = false;
+            }
+            else
+                org = directiva.org;
+            /*correcto = false;
+            error = "no existe el CODOP (codigo de operacion)";*/
         }
+        if(correcto && !etq.equals("NULL"))
+            correcto = ValidarEtq(conlocaux);
+        if(correcto)
+            conloc = conlocaux;
         return correcto;
     }
 }
