@@ -143,7 +143,7 @@ public class ModDir {
                                     if(comprobador.matches())
                                         formato = 7;
                                     else{
-                                        expReg = Pattern.compile("(\\$|%|@|\\-|)([A-F]|[0-9])+,((\\-|\\+)[A-Z]+|[A-Z]+(\\-|\\+))");//n,-+r-+ (IDX con pre/post decremento/incremento)
+                                        expReg = Pattern.compile("(\\$|%|@|-|)([A-F]|[0-9])+,((-|\\+)[A-Z]+|[A-Z]+(-|\\+))");//n,-+r-+ (IDX con pre/post decremento/incremento)
                                         comprobador = expReg.matcher(oper);
                                         if(comprobador.matches())
                                             formato = 9;
@@ -388,7 +388,7 @@ public class ModDir {
                 BasesNumericas numero = new BasesNumericas(oper1);
                 Pattern expReg;
                 Matcher comprobador;
-                expReg = Pattern.compile("((\\+|\\-)[X|Y|SP])|([X|Y|SP])(\\+|\\-)");
+                expReg = Pattern.compile("((\\+|-)(X|Y|SP))|((X|Y|SP)(\\+|-))");
                 comprobador = expReg.matcher(oper2);
                 if(comprobador.matches()){
                     if(numero.ValorEntero() >= 1 && numero.ValorEntero() <= 8)

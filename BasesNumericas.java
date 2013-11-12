@@ -98,6 +98,12 @@ public class BasesNumericas{
         return bits;
     }
     
+    protected void Cauno(){
+        int aux = ValorEntero();
+        aux = ~aux;
+        valor = Integer.toString(aux);
+    }
+    
     protected void CambioBase(int baseNum){
         int valorNum;
         valorNum = Integer.parseInt(valor, base);
@@ -121,5 +127,19 @@ public class BasesNumericas{
         }
         aux1 += aux2;
         return aux1.toUpperCase();
+    }
+    
+    public String BinnD(int D){
+        String aux1 = "", aux2;
+        aux2 = Integer.toBinaryString(Integer.parseInt(valor));
+        if(aux2.charAt(0) == '1' && aux2.length() >= D)
+            aux2 = aux2.substring(aux2.length() - D);
+        int i = aux2.length();
+        while(i < D){
+            aux1 += "0";
+            i++;
+        }
+        aux1 += aux2;
+        return aux1;
     }
 }
